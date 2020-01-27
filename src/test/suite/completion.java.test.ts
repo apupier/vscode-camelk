@@ -44,7 +44,7 @@ suite('Should do completion in Camel K standalone files', () => {
 			testVar.skip();
 		}
 		await testCompletion(docUriJava, new vscode.Position(5, 11), expectedCompletion);
-	}).timeout(781000);
+	}).timeout(7810000);
 
 });
 
@@ -55,7 +55,7 @@ async function testCompletion(
 ) {
 	await waitUntil(()=> {
 		return areJavaDependenciesDownloaded || errorDuringJavaDependenciesDownload;
-	}, 720000).catch((error: any) => {
+	}, 7200000).catch((error: any) => {
 		console.log('Cannot retrieve artefacts', error);
 		logMaven();
 	});
