@@ -3,7 +3,7 @@
 node('rhel7'){
 	stage('Checkout repo') {
 		deleteDir()
-		git url: 'https://github.com/camel-tooling/vscode-camelk'
+		git branch: 'FUSETOOLS2-207-timeoutonJenkins-toBranchOnJenkins', url: 'https://github.com/apupier/vscode-camelk'
 	}
 
 	stage('Install requirements') {
@@ -40,11 +40,11 @@ node('rhel7'){
 	if(params.UPLOAD_LOCATION) {
 		stage('Snapshot') {
 			def filesToPush = findFiles(glob: '**.vsix')
-			sh "rsync -Pzrlt --rsh=ssh --protocol=28 ${filesToPush[0].path} ${UPLOAD_LOCATION}/snapshots/vscode-camelk/"
+			//sh "rsync -Pzrlt --rsh=ssh --protocol=28 ${filesToPush[0].path} ${UPLOAD_LOCATION}/snapshots/vscode-camelk/"
             stash name:'vsix', includes:filesToPush[0].path
             def tgzFilesToPush = findFiles(glob: '**.tgz')
             stash name:'tgz', includes:tgzFilesToPush[0].path
-            sh "rsync -Pzrlt --rsh=ssh --protocol=28 ${tgzFilesToPush[0].path} ${UPLOAD_LOCATION}/snapshots/vscode-camelk/"
+            //sh "rsync -Pzrlt --rsh=ssh --protocol=28 ${tgzFilesToPush[0].path} ${UPLOAD_LOCATION}/snapshots/vscode-camelk/"
         }
     }
 }
