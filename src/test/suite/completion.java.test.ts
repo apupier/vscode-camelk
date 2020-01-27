@@ -57,11 +57,9 @@ async function testCompletion(
 		return areJavaDependenciesDownloaded || errorDuringJavaDependenciesDownload;
 	}, 720000).catch((error: any) => {
 		console.log('Cannot retrieve artefacts', error);
+		logMaven();
 	});
-	let extensionStorage = getStashedContext().globalStoragePath;
-    let logpath = path.join(extensionStorage, 'log.txt');
-	let logContent = fs.readFileSync(logpath,'utf8');
-	console.log('Maven log:', logContent);
+	let logContent = logMaven();
 	assert.isFalse(errorDuringJavaDependenciesDownload, `There was a problem during Java dependencies download. ${logContent}`);
 	assert.isOk(areJavaDependenciesDownloaded, 'This machine requires more time to download initial dependencies (Maven, Maven plugins and Camel).');
 
@@ -88,3 +86,11 @@ async function testCompletion(
 	}, 10000, 500);
 
 }
+function logMaven() {
+	let extensionStorage = getStashedContext().globalStoragePath;
+	let logpath = path.join(extensionStorage, 'log.txt');
+	let logContent = fs.readFileSync(logpath, 'utf8');
+	console.log('Maven log:', logContent);
+	return logContent;
+}
+
