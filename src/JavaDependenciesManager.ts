@@ -22,6 +22,7 @@ const PREFERENCE_KEY_JAVA_REFERENCED_LIBRARIES = "java.project.referencedLibrari
 
 export var areJavaDependenciesDownloaded = false;
 export var errorDuringJavaDependenciesDownload = false;
+export var logFilePath : string| undefined = undefined;
 
 export function downloadJavaDependencies(context:vscode.ExtensionContext): string {
     let pomTemplate = context.asAbsolutePath(path.join('resources', 'maven-project', 'pom-to-copy-java-dependencies.xml'));
@@ -29,6 +30,7 @@ export function downloadJavaDependencies(context:vscode.ExtensionContext): strin
     let camelVersion = "3.0.0";
 
     let destination = path.join(extensionStorage, `java-dependencies-${camelVersion}`);
+    logFilePath = path.join(extensionStorage, 'log.txt');
     fs.mkdirSync(destination, { recursive: true });
 
     /* provides only camel-core-engine dependencies for now, to improve:
@@ -37,7 +39,7 @@ export function downloadJavaDependencies(context:vscode.ExtensionContext): strin
     const mvn = require('maven').create({
         cwd: destination,
         file: pomTemplate,
-
+        logFile: logFilePath
     });
     mvn.execute(['dependency:copy-dependencies'], {'camelVersion': camelVersion, 'outputDirectory': destination}).then(() => {
         areJavaDependenciesDownloaded = true;
@@ -87,4 +89,3 @@ function ensureReferencedLibrariesContainsCamelK(refLibrariesConfig: string[], c
         configuration.update(configurationKey, refLibrariesConfig);
     }
 }
-

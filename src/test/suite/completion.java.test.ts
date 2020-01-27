@@ -16,9 +16,10 @@
  */
 'use strict';
 
+const fs = require('fs');
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { areJavaDependenciesDownloaded, errorDuringJavaDependenciesDownload } from '../../JavaDependenciesManager';
+import { areJavaDependenciesDownloaded, errorDuringJavaDependenciesDownload, logFilePath } from '../../JavaDependenciesManager';
 import { assert } from 'chai';
 
 const os = require('os');
@@ -53,10 +54,12 @@ async function testCompletion(
 ) {
 	await waitUntil(()=> {
 		return areJavaDependenciesDownloaded || errorDuringJavaDependenciesDownload;
-	}, 360000).catch((error: any) => {	
+	}, 360000).catch((error: any) => {
 		console.log('Cannot retrieve artefacts', error);
 	});
-	assert.isFalse(errorDuringJavaDependenciesDownload, 'There was a problem during Java dependencies download.');
+	let logContent = fs.readFileSync(logFilePath,'utf8');
+	console.log('Maven log:', logContent);
+	assert.isFalse(errorDuringJavaDependenciesDownload, `There was a problem during Java dependencies download. ${logContent}`);
 	assert.isOk(areJavaDependenciesDownloaded, 'This machine requires more time to download initial dependencies (Maven, Maven plugins and Camel).');
 
 	let doc = await vscode.workspace.openTextDocument(docUri);
