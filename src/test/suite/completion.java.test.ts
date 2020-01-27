@@ -42,7 +42,7 @@ suite('Should do completion in Camel K standalone files', () => {
 			testVar.skip();
 		}
 		await testCompletion(docUriJava, new vscode.Position(5, 11), expectedCompletion);
-	}).timeout(121000);
+	}).timeout(391000);
 
 });
 
@@ -53,12 +53,11 @@ async function testCompletion(
 ) {
 	await waitUntil(()=> {
 		return areJavaDependenciesDownloaded || errorDuringJavaDependenciesDownload;
-	}, 90000).catch((error: any) => {
-		
+	}, 360000).catch((error: any) => {	
 		console.log('Cannot retrieve artefacts', error);
 	});
 	assert.isFalse(errorDuringJavaDependenciesDownload, 'There was a problem during Java dependencies download.');
-	assert.isOk(areJavaDependenciesDownloaded);
+	assert.isOk(areJavaDependenciesDownloaded, 'This machine requires more time to download initial dependencies (Maven, Maven plugins and Camel).');
 
 	let doc = await vscode.workspace.openTextDocument(docUri);
 	await vscode.window.showTextDocument(doc);
