@@ -19,8 +19,9 @@
 const fs = require('fs');
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { areJavaDependenciesDownloaded, errorDuringJavaDependenciesDownload, logFilePath } from '../../JavaDependenciesManager';
+import { areJavaDependenciesDownloaded, errorDuringJavaDependenciesDownload } from '../../JavaDependenciesManager';
 import { assert } from 'chai';
+import { getStashedContext } from '../../extension';
 
 const os = require('os');
 const waitUntil = require('async-wait-until');
@@ -57,7 +58,9 @@ async function testCompletion(
 	}, 720000).catch((error: any) => {
 		console.log('Cannot retrieve artefacts', error);
 	});
-	let logContent = fs.readFileSync(logFilePath,'utf8');
+	let extensionStorage = getStashedContext().globalStoragePath;
+    let logpath = path.join(extensionStorage, 'log.txt');
+	let logContent = fs.readFileSync(logpath,'utf8');
 	console.log('Maven log:', logContent);
 	assert.isFalse(errorDuringJavaDependenciesDownload, `There was a problem during Java dependencies download. ${logContent}`);
 	assert.isOk(areJavaDependenciesDownloaded, 'This machine requires more time to download initial dependencies (Maven, Maven plugins and Camel).');
