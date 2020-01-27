@@ -41,7 +41,7 @@ suite('Should do completion in Camel K standalone files', () => {
 			testVar.skip();
 		}
 		await testCompletion(docUriJava, new vscode.Position(5, 11), expectedCompletion);
-	}).timeout(76000);
+	}).timeout(121000);
 
 });
 
@@ -52,7 +52,7 @@ async function testCompletion(
 ) {
 	await waitUntil(()=> {
 		return areJavaDependenciesDownloaded;
-	}, 45000);
+	}, 90000);
 
 	let doc = await vscode.workspace.openTextDocument(docUri);
 	await vscode.window.showTextDocument(doc);
