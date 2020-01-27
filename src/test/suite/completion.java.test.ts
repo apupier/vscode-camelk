@@ -18,7 +18,8 @@
 
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { areJavaDependenciesDownloaded } from '../../JavaDependenciesManager';
+import { areJavaDependenciesDownloaded, errorDuringJavaDependenciesDownload } from '../../JavaDependenciesManager';
+import { assert } from 'chai';
 
 const os = require('os');
 const waitUntil = require('async-wait-until');
@@ -51,8 +52,13 @@ async function testCompletion(
 	expectedCompletion: vscode.CompletionItem
 ) {
 	await waitUntil(()=> {
-		return areJavaDependenciesDownloaded;
-	}, 90000);
+		return areJavaDependenciesDownloaded || errorDuringJavaDependenciesDownload;
+	}, 90000).catch((error: any) => {
+		
+		console.log('Cannot retrieve artefacts', error);
+	});
+	assert.isFalse(errorDuringJavaDependenciesDownload, 'There was a problem during Java dependencies download.');
+	assert.isOk(areJavaDependenciesDownloaded);
 
 	let doc = await vscode.workspace.openTextDocument(docUri);
 	await vscode.window.showTextDocument(doc);
