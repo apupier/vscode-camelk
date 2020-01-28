@@ -26,6 +26,7 @@ node('rhel7'){
         stage('Test') {
     		wrap([$class: 'Xvnc']) {
     			sh "npm test --silent"
+				archiveArtifacts artifacts:"**/logMaven.txt"
     			junit 'report.xml'
     		}
         }

@@ -30,7 +30,8 @@ export function downloadJavaDependencies(context:vscode.ExtensionContext): strin
     let camelVersion = "3.0.0";
 
     let destination = path.join(extensionStorage, `java-dependencies-${camelVersion}`);
-    logFilePath = path.join(extensionStorage, 'log.txt');
+    logFilePath = path.join(extensionStorage, 'logMaven.txt');
+    console.log('logFilePath'+logFilePath);
     fs.mkdirSync(destination, { recursive: true });
 
     /* provides only camel-core-engine dependencies for now, to improve:
