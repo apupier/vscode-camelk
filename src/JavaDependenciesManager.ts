@@ -44,8 +44,10 @@ export function downloadJavaDependencies(context:vscode.ExtensionContext): strin
     });
     mvn.execute(['dependency:copy-dependencies'], {'camelVersion': camelVersion, 'outputDirectory': destination}).then(() => {
         areJavaDependenciesDownloaded = true;
+        console.log('maven command finished');
     }).catch((error: string) => {
         errorDuringJavaDependenciesDownload = true;
+        console.log('error of the maven command');
     });
     return destination;
 }
