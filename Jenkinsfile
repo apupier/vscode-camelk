@@ -26,13 +26,13 @@ node('rhel7'){
         stage('Test') {
     		wrap([$class: 'Xvnc']) {
     			sh "npm test --silent"
-    		}
     		post {
 				always {
 					archiveArtifacts artifacts:"/home/hudson/.config/Code/User/globalStorage/redhat.vscode-camelk/logMaven.txt"
     				junit 'report.xml'
 				}
 			}
+    		}
         }
 	}
 
