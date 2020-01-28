@@ -314,7 +314,7 @@ export async function getIntegrationsFromKubectlCliWithWatch() : Promise<void> {
 }
 
 // use kubectl to keep an eye on the server for changes and update the view
-async function startListeningForServerChanges(): Promise<void> {
+export async function startListeningForServerChanges(): Promise<void> {
 	await getIntegrationsFromKubectlCliWithWatch();
 }
 

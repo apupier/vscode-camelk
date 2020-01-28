@@ -16,13 +16,19 @@
  */
 'use strict';
 
-import * as vscode from 'vscode';
 import * as assert from 'assert';
-import * as kamel from '../../kamel';
+import * as fs from 'fs';
+import * as sinon from 'sinon';
+import * as vscode from 'vscode';
 import * as config from '../../config';
+import * as extension from '../../extension';
+import * as kamel from '../../kamel';
+
+const waitUntil = require('async-wait-until');
 
 suite("ensure camelk extension exists and is accessible", function() {
 	const extensionId = 'redhat.vscode-camelk';
+	let startListeningForServerChanges = sinon.spy(extension, 'startListeningForServerChanges');
 
 	test('vscode-camelk extension should be present', function(done) {
 		assert.ok(vscode.extensions.getExtension(extensionId));
@@ -43,8 +49,7 @@ suite("ensure camelk extension exists and is accessible", function() {
 			assert.fail("Camel K extension is undefined");
 			done();
 		}
-	});	
-
+	});
 
 	test('test optional namespace support', function(done) {
 		let cmdStrNoNS : string = kamel.getBaseCmd(`fakepath`,`fakecommand`, undefined);
@@ -91,5 +96,20 @@ suite("ensure camelk extension exists and is accessible", function() {
 
 		// reset to old value
 		await config.addNamespaceToConfig(namespace);
-	});	
+	});
+
+
+	test('Check there is no loop for closing kubectl process', async function() {
+		ensureKubectlIsAvailable();
+		sinon.assert.notCalled(startListeningForServerChanges);
+	});
+
 });
+
+function ensureKubectlIsAvailable() {
+	waitUntil(() => {
+		let kubectlPath = config.getActiveKubectlconfig();
+		return fs.existsSync(kubectlPath);
+	});
+}
+
