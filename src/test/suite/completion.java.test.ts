@@ -23,7 +23,6 @@ import { areJavaDependenciesDownloaded, errorDuringJavaDependenciesDownload } fr
 import { assert } from 'chai';
 import { getStashedContext } from '../../extension';
 
-const os = require('os');
 const waitUntil = require('async-wait-until');
 
 const getDocPath = (p: string) => {
@@ -39,10 +38,7 @@ suite('Should do completion in Camel K standalone files', () => {
 
 	const expectedCompletion = { label: 'from(String uri) : RouteDefinition'};
 
-	var testVar = test('Completes from method for Java', async () => {
-		if(os.homedir().includes('hudson')) {
-			testVar.skip();
-		}
+	test('Completes from method for Java', async () => {
 		await testCompletion(docUriJava, new vscode.Position(5, 11), expectedCompletion);
 	}).timeout(7810000);
 
