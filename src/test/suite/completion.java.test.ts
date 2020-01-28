@@ -16,12 +16,10 @@
  */
 'use strict';
 
-const fs = require('fs');
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { areJavaDependenciesDownloaded, errorDuringJavaDependenciesDownload } from '../../JavaDependenciesManager';
 import { assert } from 'chai';
-import { getStashedContext } from '../../extension';
 
 const waitUntil = require('async-wait-until');
 
@@ -53,10 +51,9 @@ async function testCompletion(
 		return areJavaDependenciesDownloaded || errorDuringJavaDependenciesDownload;
 	}, 45000).catch((error: any) => {
 		console.log('Cannot retrieve artefacts', error);
-		logMaven();
 	});
-	let logContent = logMaven();
-	assert.isFalse(errorDuringJavaDependenciesDownload, `There was a problem during Java dependencies download. ${logContent}`);
+
+	assert.isFalse(errorDuringJavaDependenciesDownload, `There was a problem during Java dependencies download.`);
 	assert.isOk(areJavaDependenciesDownloaded, 'This machine requires more time to download initial dependencies (Maven, Maven plugins and Camel).');
 
 	let doc = await vscode.workspace.openTextDocument(docUri);
@@ -82,11 +79,3 @@ async function testCompletion(
 	}, 10000, 500);
 
 }
-function logMaven() {
-	let extensionStorage = getStashedContext().globalStoragePath;
-	let logpath = path.join(extensionStorage, 'log.txt');
-	let logContent = fs.readFileSync(logpath, 'utf8');
-	console.log('Maven log:', logContent);
-	return logContent;
-}
-
