@@ -41,7 +41,8 @@ export function downloadJavaDependencies(context:vscode.ExtensionContext): strin
         cwd: destination,
         file: pomTemplate,
         logFile: logFilePath,
-        batchMode: true
+        batchMode: true,
+        debug: true
     });
     mvn.execute(['dependency:copy-dependencies'], {'camelVersion': camelVersion, 'outputDirectory': destination}).then(() => {
         areJavaDependenciesDownloaded = true;
