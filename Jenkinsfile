@@ -10,6 +10,10 @@ node('rhel7'){
 		def nodeHome = tool 'nodejs-8.11.1'
 		env.PATH="${env.PATH}:${nodeHome}/bin"
 		sh "npm install -g typescript vsce"
+
+		def mavenHome = tool 'maven-3.5.4'
+		env.PATH="${env.PATH}:${mavenHome}/bin"
+		sh "mvn -version"
 	}
 
 	stage('Build') {
