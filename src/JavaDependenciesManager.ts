@@ -40,7 +40,8 @@ export function downloadJavaDependencies(context:vscode.ExtensionContext): strin
     const mvn = require('maven').create({
         cwd: destination,
         file: pomTemplate,
-        logFile: logFilePath
+        logFile: logFilePath,
+        batchMode: true
     });
     mvn.execute(['dependency:copy-dependencies'], {'camelVersion': camelVersion, 'outputDirectory': destination}).then(() => {
         areJavaDependenciesDownloaded = true;
