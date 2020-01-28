@@ -29,7 +29,7 @@ node('rhel7'){
     		}
     		post {
 				always {
-					archiveArtifacts artifacts:"**/logMaven.txt"
+					archiveArtifacts artifacts:"/home/hudson/.config/Code/User/globalStorage/redhat.vscode-camelk/logMaven.txt"
     				junit 'report.xml'
 				}
 			}
