@@ -27,13 +27,13 @@ node('rhel7'){
     		wrap([$class: 'Xvnc']) {
     			sh "npm test --silent"
     		}
-        }
-		post {
-			always {
-				archiveArtifacts artifacts:"**/logMaven.txt"
-    			junit 'report.xml'
+    		post {
+				always {
+					archiveArtifacts artifacts:"**/logMaven.txt"
+    				junit 'report.xml'
+				}
 			}
-		}
+        }
 	}
 
 	stage('Package') {
