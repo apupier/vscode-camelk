@@ -17,24 +17,18 @@
 'use strict';
 
 import * as assert from 'assert';
-import * as fs from 'fs';
-import * as sinon from 'sinon';
 import * as vscode from 'vscode';
 import * as config from '../../config';
-import * as extension from '../../extension';
 import * as kamel from '../../kamel';
-
-const waitUntil = require('async-wait-until');
 
 suite("ensure camelk extension exists and is accessible", function() {
 	const extensionId = 'redhat.vscode-camelk';
-	let startListeningForServerChanges = sinon.spy(extension, 'startListeningForServerChanges');
-
+	
 	test('vscode-camelk extension should be present', function(done) {
 		assert.ok(vscode.extensions.getExtension(extensionId));
 		done();
 	});
-
+	
 	test('vscode-camelk extension should activate', function (done) {
 		let extension = vscode.extensions.getExtension(extensionId);
 		if (extension !== null && extension !== undefined) {
@@ -50,66 +44,52 @@ suite("ensure camelk extension exists and is accessible", function() {
 			done();
 		}
 	});
-
+	
 	test('test optional namespace support', function(done) {
 		let cmdStrNoNS : string = kamel.getBaseCmd(`fakepath`,`fakecommand`, undefined);
 		assert.equal(cmdStrNoNS.indexOf('--namespace'), -1);
-
+		
 		let cmdStrWithNS : string = kamel.getBaseCmd(`fakepath`,`fakecommand`, 'fakens');
 		assert.equal(cmdStrWithNS.indexOf('--namespace') > 0, true);
-
+		
 		done();
 	});
-
+	
 	test('test setting namespace to undefined', async function() {
 		// get NS from config settings
 		const namespace : string | undefined = config.getNamespaceconfig();
-
+		
 		// reset to undefined
 		await config.addNamespaceToConfig(undefined);
-
+		
 		// get NS from config settings
 		const resetNs : string | undefined = config.getNamespaceconfig();
-
+		
 		// by default this should be undefined
 		assert.equal(resetNs, undefined);
-
+		
 		// reset to old value
 		await config.addNamespaceToConfig(namespace);
 	});
-
+	
 	test('test setting namespace to other value', async function() {
 		// get NS from config settings
 		const namespace : string | undefined = config.getNamespaceconfig();
-
+		
 		// get NS from config settings
 		const testNs = 'testing';
-
+		
 		// override namespace
 		await config.addNamespaceToConfig(testNs);
-
+		
 		// re-retrieve namespace, should be test NS we specified
 		const resetNs : string | undefined = config.getNamespaceconfig();
-
+		
 		// this should be 'testing'
 		assert.equal(resetNs, testNs);
-
+		
 		// reset to old value
 		await config.addNamespaceToConfig(namespace);
 	});
 
-
-	test('Check there is no loop for closing kubectl process', async function() {
-		ensureKubectlIsAvailable();
-		sinon.assert.notCalled(startListeningForServerChanges);
-	});
-
 });
-
-function ensureKubectlIsAvailable() {
-	waitUntil(() => {
-		let kubectlPath = config.getActiveKubectlconfig();
-		return fs.existsSync(kubectlPath);
-	});
-}
-

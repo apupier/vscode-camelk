@@ -293,16 +293,16 @@ export async function getIntegrationsFromKubectlCliWithWatch() : Promise<void> {
 				runningKubectl = runKubectl;
 				if (runKubectl.stdout) {
 					runKubectl.stdout.on('data', async function () {
-						if (camelKIntegrationsTreeView.visible === true) {
+						//if (camelKIntegrationsTreeView.visible === true) {
 							await camelKIntegrationsProvider.refresh().catch(err => console.log(err));
-						}
+						//}
 					});
 				}
-				runKubectl.on("close", (close) => {
-					if (camelKIntegrationsTreeView.visible === true) {
+				runKubectl.on("close", () => {
+					//if (camelKIntegrationsTreeView.visible === true) {
 						// stopped listening to server - likely timed out
 						eventEmitter.emit(restartKubectlWatchEvent);
-					}
+					//}
 					runningKubectl = undefined;
 				});				
 			})
@@ -315,8 +315,13 @@ export async function getIntegrationsFromKubectlCliWithWatch() : Promise<void> {
 
 // use kubectl to keep an eye on the server for changes and update the view
 export async function startListeningForServerChanges(): Promise<void> {
+	console.log('startListeningForServerChanges');
 	await getIntegrationsFromKubectlCliWithWatch();
 }
+
+export function dummy(dumdum :string): string {
+	return "";
+} 
 
 function applyStatusBarSettings(): void {
 	let statusBarSetting = vscode.workspace.getConfiguration().get(config.SHOW_STATUS_BAR_KEY) as boolean;
