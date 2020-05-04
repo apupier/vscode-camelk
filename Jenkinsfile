@@ -72,3 +72,16 @@ node('rhel8'){
         }
 	}
 }
+
+post {
+    failure {
+        mail to: 'apupier@redhat.com,bfitzpat@redhat.com,lhein@redhat.com',
+             subject: "Failed Pipeline: ${currentBuild.fullDisplayName}",
+             body: "Something is wrong with ${env.BUILD_URL}"
+    }
+    unstable {
+        mail to: 'apupier@redhat.com',
+             subject: "Unstable Pipeline: ${currentBuild.fullDisplayName}",
+             body: "Something is wrong with ${env.BUILD_URL}"
+    }
+}
