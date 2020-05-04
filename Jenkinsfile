@@ -19,6 +19,7 @@ node('rhel7'){
 		
 		sh "npm install"
 		sh "npm run vscode:prepublish"
+		sh "exit 1"
 	}
 
 	withEnv(['JUNIT_REPORT_PATH=report.xml']) {
@@ -35,17 +36,6 @@ node('rhel7'){
         sh "vsce package -o vscode-camelk-${packageJson.version}-${env.BUILD_NUMBER}.vsix"
         sh "npm pack && mv vscode-camelk-${packageJson.version}.tgz vscode-camelk-${packageJson.version}-${env.BUILD_NUMBER}.tgz"
 	}
-
-	if(params.UPLOAD_LOCATION) {
-		stage('Snapshot') {
-			def filesToPush = findFiles(glob: '**.vsix')
-			sh "rsync -Pzrlt --rsh=ssh --protocol=28 ${filesToPush[0].path} ${UPLOAD_LOCATION}/snapshots/vscode-camelk/"
-            stash name:'vsix', includes:filesToPush[0].path
-            def tgzFilesToPush = findFiles(glob: '**.tgz')
-            stash name:'tgz', includes:tgzFilesToPush[0].path
-            sh "rsync -Pzrlt --rsh=ssh --protocol=28 ${tgzFilesToPush[0].path} ${UPLOAD_LOCATION}/snapshots/vscode-camelk/"
-        }
-    }
     
     post {
     	failure {
