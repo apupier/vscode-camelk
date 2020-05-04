@@ -79,75 +79,76 @@ const choiceList = [
 					devMode = true;
 					break;
 				case configMapIntegration:
-					await getSelectedConfigMap().then( (selection) => {
-						selectedConfigMap = selection;
+					try {
+						selectedConfigMap = await getSelectedConfigMap();
 						if (selectedConfigMap === undefined) {
 							reject (new Error('No ConfigMap selected.'));
 							errorEncountered = true;
 						}
-					}).catch ( (error) => {
+					} catch (error) {
 						reject(error);
 						errorEncountered = true;
-					});
+					}
 					break;
 				case secretIntegration:
-					await getSelectedSecret().then( (selection) => {
-						selectedSecret = selection;
+					try {
+						selectedSecret = await getSelectedSecret();
 						if (selectedSecret === undefined) {
 							reject (new Error('No Secret selected.'));
 							errorEncountered = true;
 						}
-					}).catch ( (error) => {
+					} catch (error) {
 						reject(error);
 						errorEncountered = true;
-					});
+					}
 					break;
 				case resourceIntegration:
-					await getSelectedResource().then( (selection) => {
-						selectedResource = selection;
+					try {
+						selectedResource = await getSelectedResource();
 						if (selectedResource === undefined) {
 							reject (new Error('No Resource selected.'));
 							errorEncountered = true;
 						}
-					}).catch ( (error) => {
+					} catch (error) {
 						reject(error);
 						errorEncountered = true;
-					});
+					}
 					break;
 				case propertyIntegration:
-					await getSelectedProperties().then ( (selection) => {
-						selectedProperty = selection;
+					try {
+						selectedProperty = await getSelectedProperties();
 						if (selectedProperty === undefined) {
 							reject (new Error('No Property defined.'));
 							errorEncountered = true;
 						}
-					}).catch ( (error) => {
+					} catch (error) {
 						reject(error);
 						errorEncountered = true;
-					});
+					}
 					break;
 				case dependencyIntegration:
-					await getSelectedDependencies().then ( (selection) => {
-						selectedDependency = selection;
+					try {
+						selectedDependency = await getSelectedDependencies();
 						if (selectedDependency === undefined) {
 							reject (new Error('No Dependencies defined.'));
 							errorEncountered = true;
 						}
-					}).catch ( (error) => {
+					} catch (error) {
 						reject(error);
 						errorEncountered = true;
-					});
+					}
 					break;
 				case basicIntegration:
 					// do nothing with config-map or secret
 					break;
 				case vscodeTasksIntegration:
-					await handleDefinedTask(context).then(() => {
+					try {
+						await handleDefinedTask(context);
 						resolve();
-					}).catch(onrejected => {
+					} catch (onrejected)  {
 						reject(onrejected);
 						errorEncountered = true;
-					});
+					}
 					return;
 			}
 
@@ -200,32 +201,30 @@ async function handleDefinedTask(context: vscode.Uri) {
 
 function getSelectedConfigMap(): Promise<string | undefined> {
 	return new Promise <string | undefined>( async (resolve, reject) => {
-		await getConfigMaps()
-			.then( (configMaps) => {
-				vscode.window.showQuickPick(configMaps, {
+		try {
+			const configMaps = await getConfigMaps();
+			const selectedConfigMap = vscode.window.showQuickPick(configMaps, {
 					placeHolder: 'Select an available Kubernetes ConfigMap or ESC to cancel'
-				}).then ( (selectedConfigMap) => {
-					resolve(selectedConfigMap);
 				});
-			}).catch ( (error) => {
-				reject(new Error(`No ConfigMaps available: ${error}`));
-			});
-		});
+			resolve(selectedConfigMap);
+		} catch (error) {
+			reject(new Error(`No ConfigMaps available: ${error}`));
+		}
+	});
 }
 
 function getSelectedSecret(): Promise<string | undefined> {
 	return new Promise<string | undefined>( async (resolve, reject) => {
-		await getSecrets()
-			.then( (secrets) => {
-				vscode.window.showQuickPick(secrets, {
-					placeHolder: 'Select an available Kubernetes Secret or ESC to cancel'
-				}).then ( (selectedSecret) => {
-					resolve(selectedSecret);
-				});
-			}).catch ( (error) => {
-				reject(new Error(`No Secrets available: ${error}`));
+		try {
+			const secrets = await getSecrets();
+			const selectedSecret = vscode.window.showQuickPick(secrets, {
+				placeHolder: 'Select an available Kubernetes Secret or ESC to cancel'
 			});
-		});
+			resolve(selectedSecret);
+		} catch (error) {
+			reject(new Error(`No Secrets available: ${error}`));
+		}
+	});
 }
 
 function getSelectedResource(): Promise<string> {
