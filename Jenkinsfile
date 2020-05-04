@@ -19,7 +19,6 @@ node('rhel7'){
 		
 		sh "npm install"
 		sh "npm run vscode:prepublish"
-		sh "exit 1"
 	}
 
 	withEnv(['JUNIT_REPORT_PATH=report.xml']) {

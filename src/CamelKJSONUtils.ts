@@ -20,7 +20,7 @@ import * as vscode from 'vscode';
 const camelAPIVersion = "v1alpha1";
 
 export function stringifyFileContents(absoluteFilePath:string) : Promise<string> {
-	return new Promise( (resolve, reject) => {
+	//return new Promise( (resolve, reject) => {
 		var text = fs.readFileSync(absoluteFilePath);
 		if (text) {
 			resolve(text.toString());
