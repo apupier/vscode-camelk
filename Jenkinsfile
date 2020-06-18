@@ -3,7 +3,7 @@
 node('rhel8'){
 	stage('Checkout repo') {
 		deleteDir()
-		git url: 'https://github.com/camel-tooling/vscode-camelk'
+		git url: 'https://github.com/apupier/vscode-camelk', branch: 'FUSETOOLS2-207-reactivatejavacompletiontestonjenkins'
 	}
 
 	stage('Install requirements') {
