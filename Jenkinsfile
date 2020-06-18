@@ -3,7 +3,7 @@
 node('rhel8'){
 	stage('Checkout repo') {
 		deleteDir()
-		git url: 'https://github.com/camel-tooling/vscode-camelk'
+		git url: 'https://github.com/apupier/vscode-camelk', branch: 'FUSETOOLS2-207-reactivatejavacompletiontestonjenkins'
 	}
 
 	stage('Install requirements') {
@@ -36,39 +36,4 @@ node('rhel8'){
         sh "npm pack && mv vscode-camelk-${packageJson.version}.tgz vscode-camelk-${packageJson.version}-${env.BUILD_NUMBER}.tgz"
 	}
 
-	if(params.UPLOAD_LOCATION) {
-		stage('Snapshot') {
-			def filesToPush = findFiles(glob: '**.vsix')
-			sh "rsync -Pzrlt --rsh=ssh --protocol=28 ${filesToPush[0].path} ${UPLOAD_LOCATION}/snapshots/vscode-camelk/"
-            stash name:'vsix', includes:filesToPush[0].path
-            def tgzFilesToPush = findFiles(glob: '**.tgz')
-            stash name:'tgz', includes:tgzFilesToPush[0].path
-            sh "rsync -Pzrlt --rsh=ssh --protocol=28 ${tgzFilesToPush[0].path} ${UPLOAD_LOCATION}/snapshots/vscode-camelk/"
-        }
-    }
-}
-
-node('rhel8'){
-	if(publishToMarketPlace.equals('true')){
-		timeout(time:5, unit:'DAYS') {
-			input message:'Approve deployment?', submitter: 'apupier,lheinema,bfitzpat,tsedmik,djelinek'
-		}
-
-		stage("Publish to Marketplace") {
-            unstash 'vsix'
-            unstash 'tgz'
-            withCredentials([[$class: 'StringBinding', credentialsId: 'vscode_java_marketplace', variable: 'TOKEN']]) {
-                def vsix = findFiles(glob: '**.vsix')
-                sh 'vsce publish -p ${TOKEN} --packagePath' + " ${vsix[0].path}"
-            }
-            archiveArtifacts artifacts:"**.vsix,**.tgz"
-
-            stage "Promote the build to stable"
-            def vsix = findFiles(glob: '**.vsix')
-            sh "rsync -Pzrlt --rsh=ssh --protocol=28 ${vsix[0].path} ${UPLOAD_LOCATION}/stable/vscode-camelk/"
-            
-            def tgz = findFiles(glob: '**.tgz')
-            sh "rsync -Pzrlt --rsh=ssh --protocol=28 ${tgz[0].path} ${UPLOAD_LOCATION}/stable/vscode-camelk/"
-        }
-	}
 }
