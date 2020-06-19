@@ -3,7 +3,7 @@
 node('rhel8'){
 	stage('Checkout repo') {
 		deleteDir()
-		git url: 'https://github.com/camel-tooling/vscode-camelk'
+		git url: 'https://github.com/apupier/vscode-camelk', branch: 'FUSETOOLS2-359-sendemailonfailure-attempt2'
 	}
 
 	stage('Install requirements') {
@@ -75,7 +75,7 @@ node('rhel8'){
 
 post {
     failure {
-        mail to: 'apupier@redhat.com,bfitzpat@redhat.com,lhein@redhat.com',
+        mail to: 'apupier@redhat.com',
              subject: "Failed Pipeline: ${currentBuild.fullDisplayName}",
              body: "Something is wrong with ${env.BUILD_URL}"
     }
