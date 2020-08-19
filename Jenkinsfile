@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-node('rhel8'){
+node('rhel7'){
 	stage('Checkout repo') {
 		deleteDir()
 		git url: 'https://github.com/apupier/vscode-camelk', branch: 'FUSETOOLS2-603-UpgradeJava11-jenkinstest'
@@ -24,12 +24,8 @@ node('rhel8'){
 	withEnv(['JUNIT_REPORT_PATH=report.xml']) {
         stage('Test') {
     		wrap([$class: 'Xvnc']) {
-				try {
-    				sh "npm test --silent"
-				} finally {
-					archiveArtifacts artifacts:"${HOME}/.config/Code/logs/**/*"
-    				junit 'report.xml'
-				}
+    			sh "npm test --silent"
+    			junit 'report.xml'
     		}
         }
 	}
