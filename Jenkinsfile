@@ -24,9 +24,12 @@ node('rhel8'){
 	withEnv(['JUNIT_REPORT_PATH=report.xml']) {
         stage('Test') {
     		wrap([$class: 'Xvnc']) {
-    			sh "npm test --silent"
-				archiveArtifacts artifacts:"~/.config/Code/logs/**/*"
-    			junit 'report.xml'
+				try {
+    				sh "npm test --silent"
+				} finally {
+					archiveArtifacts artifacts:"~/.config/Code/logs/**/*"
+    				junit 'report.xml'
+				}
     		}
         }
 	}
