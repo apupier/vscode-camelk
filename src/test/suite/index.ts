@@ -45,6 +45,7 @@ const mocha = new Mocha({
 });
 
 export function run(): Promise<void> {
+	console.log('beginning of index.run(). __dirname:' + __dirname);
 	const testsRoot = path.resolve(__dirname, '..');
 	console.log(`testsRoot = ${testsRoot}`);
 	const coverageRunner = loadCoverageRunner(testsRoot);
@@ -59,14 +60,16 @@ export function run(): Promise<void> {
 			files.forEach(f => {
 				mocha.addFile(path.resolve(testsRoot, f));
 			});
-
+			console.log('Will run tests...');
 			try {
 				// Run the mocha test
 				mocha.run(failures => {
 					if (failures > 0) {
+						console.log('Tests ran with failure');
 						e(new Error(`${failures} tests failed.`));
 					} else {
 						c();
+						console.log('Tests ran without failure');
 					}
 				}).on('end', () => coverageRunner && coverageRunner.reportCoverage());
 			} catch (innererr) {
