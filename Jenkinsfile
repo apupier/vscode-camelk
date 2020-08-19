@@ -27,7 +27,7 @@ node('rhel8'){
 				try {
     				sh "npm test --silent"
 				} finally {
-					archiveArtifacts artifacts:"/home/**/.config/Code/logs/**/*"
+					archiveArtifacts artifacts:"${HOME}/.config/Code/logs/**/*"
     				junit 'report.xml'
 				}
     		}
