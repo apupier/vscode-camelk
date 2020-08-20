@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-node('rhel8'){
+node('rhel7'){
 	stage('Checkout repo') {
 		deleteDir()
 		git url: 'https://github.com/camel-tooling/vscode-camelk'
