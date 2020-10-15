@@ -3,7 +3,7 @@
 [![License](https://img.shields.io/badge/license-Apache%202-blue.svg)]()
 [![Gitter](https://img.shields.io/gitter/room/camel-tooling/Lobby.js.svg)](https://gitter.im/camel-tooling/Lobby)
 
-yet another dummy test
+again yet another dummy test
 
 # Visual Studio extension to support Apache Camel K
 
@@ -192,7 +192,7 @@ In a Groovy route, that might look like **from('timer:props?period=1s').log('{{m
 
 ### Steps
 
-1. In the VS Code Explorer view, right-click on the *.properties file.
+1. In the VS Code Explorer viewspring-projects/sts4#548, right-click on the *.properties file.
 2. Select one of the following options:
     * Create Kubernetes Config Map from File
     * Create Kubernetes Secret from File
