@@ -36,6 +36,7 @@ import { LogsPanel } from './logsWebview';
 import * as logUtils from './logUtils';
 import {checkKamelNeedsUpdate, version, handleChangeRuntimeConfiguration} from './versionUtils';
 import * as NewIntegrationFileCommand from './commands/NewIntegrationFileCommand';
+import * as StartJavaDebuggerCommand from './commands/StartJavaDebuggerCommand';
 import * as path from 'path';
 import { registerCamelKSchemaProvider } from './CamelKSchemaManager';
 
@@ -161,6 +162,9 @@ export async function activate(context: vscode.ExtensionContext) {
 
 		vscode.commands.registerCommand('camelk.integrations.createNewIntegrationFile', async (...args:any[]) => { await NewIntegrationFileCommand.create(args);});
 		vscode.commands.registerCommand('camelk.integrations.selectFirstNode', () => { selectFirstItemInTree();});
+		vscode.commands.registerCommand('camelk.integrations.debug.java', async (integrationItem: TreeNode) => {
+			await StartJavaDebuggerCommand.start(integrationItem);
+		});
 	});
 
 	let destination = downloadJavaDependencies(context);

@@ -151,6 +151,10 @@
 				"command": "camelk.integrations.createNewIntegrationFile",
 				"title": "Create a new Apache Camel K Integration file",
 				"enablement": "workspaceFolderCount != 0"
+			},
+			{
+				"command": "camelk.integrations.debug.java",
+				"title": "Start Java debugger on Camel K integration"
 			}
 		],
 		"menus": {
@@ -202,6 +206,11 @@
 				{
 					"command": "camelk.integrations.log",
 					"group": "2_loggroup@1",
+					"when": "view == camelk.integrations"
+				},
+				{
+					"command": "camelk.integrations.debug.java",
+					"group": "3_debuggroup@2",
 					"when": "view == camelk.integrations"
 				}
 			]
