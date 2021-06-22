@@ -42,6 +42,49 @@
 	],
 	"main": "./out/src/extension.js",
 	"contributes": {
+		"walkthroughs": [
+			{
+				"id": "redhat.vscode-camelk.first-integration",
+				"title": "Camel K Integration",
+				"description": "Create your first Camel K integration",
+				"steps": [
+					{
+						"id": "extension-pack",
+						"title": "Install extension pack for Camel",
+						"description": "The extension pack for Camel is coming with a set of useful extension that will ease development of Camel K integration files.\n[Click to install](command:workbench.extensions.installExtension?%22redhat.apache-camel-extension-pack%22)",
+						"completionEvents": [
+							"extensionInstalled:redhat.apache-camel-extension-pack"
+						],
+						"media": {
+							"image": "images/install-camelk-extension.jpg",
+							"altText": "Image showing the 'install extension' view with Apache Camel Extension pack"
+						}
+					},
+					{
+						"id": "create",
+						"title": "Create Camel K integration file",
+						"description": "Use built-in command to create a Camel K integration file in the language of your choice.\n[Click to launch command](command:camelk.createNewIntegrationFile)",
+						"completionEvents": [
+							"onCommand:camelk.integrations.createNewIntegrationFile"
+						],
+						"media": {
+							"markdown": "media/createIntegration.md"
+						}
+					},
+					{
+						"id": "deploy",
+						"title": "Deploy Camel K integration",
+						"description": "Deploy the Camel K integration file to a running instance of Camel K.\n\n[Click to launch command](command:camelk.startintegration)",
+						"completionEvents": [
+							"onCommand:camelk.startintegration"
+						],
+						"media": {
+							"markdown": "media/deployIntegration.md"
+						}
+					}
+				]
+			}
+		],
 		"configuration": [
 			{
 				"title": "Apache Camel K Tooling Extension Settings",
@@ -110,7 +153,7 @@
 			{
 				"command": "camelk.integrations.refresh",
 				"title": "Refresh Apache Camel K Integration List",
-				"icon": {
+				"icon": {[Click to launch command](command:camelk.integrations.createNewIntegrationFile)
 					"dark": "resources/dark/refresh.svg",
 					"light": "resources/light/refresh.svg"
 				}
@@ -321,6 +364,7 @@
 				}
 			]
 		}
+		
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run clean && npm run compile",
