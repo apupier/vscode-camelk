@@ -15,17 +15,22 @@
  * limitations under the License.
  */
 
- import { getRedHatService, TelemetryEvent, TelemetryService } from '@redhat-developer/vscode-redhat-telemetry';
+import { getRedHatService, TelemetryEvent, TelemetryService } from '@redhat-developer/vscode-redhat-telemetry';
 import * as vscode from 'vscode';
 
 
 export let telemetryService: Promise<TelemetryService>;
+console.log('Running through Telemetry.ts');
+
 
 export async function initializeTelemetry(context: vscode.ExtensionContext) {
+	console.log('Will initialize Telemetry');
 	telemetryService = (await getRedHatService(context)).getTelemetryService();
+	console.log('Telemetry initialized');
 }
 
 export async function getTelemetryServiceInstance(): Promise<TelemetryService> {
+	console.log('attempt to retrieve telemetry service instance');
     return telemetryService;
 }
 
