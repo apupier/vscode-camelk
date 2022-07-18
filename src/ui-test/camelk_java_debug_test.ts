@@ -23,10 +23,7 @@ describe.only('Tooling for Apache Camel K extension', function () {
 
 	before(async function () {
 		this.timeout(90000);
-		await new EditorView().closeAllEditors();
-		await prepareEmptyTestFolder(WORKSPACE_FOLDER);
-		await VSBrowser.instance.openResources(WORKSPACE_FOLDER);
-		// have a conditional wait for the extension to be activated
+		await prepareTempWorkspaceForTests(WORKSPACE_FOLDER);
 		await VSBrowser.instance.driver.sleep(3000);
 	});
 	
@@ -160,11 +157,8 @@ async function removeIntegration(integrationLabel: string) {
 	await removeItem?.click();
 }
 
-// async function removeFile(fileName: string) {
-// 	const section = await new SideBarView().getContent().getSection('Explorer') as CustomTreeSection;
-// 	const item = await section.findItem(fileName + ".java") as ViewItem;
-// 	const menu = await item.openContextMenu();
-// 	const removeItem = await menu.getItem('Delete');
-// 	await removeItem?.click();
-// 	await new ModalDialog().pushButton('Move to Trash');
-// }
+async function prepareTempWorkspaceForTests(workspaceFolder: string) {
+	await new EditorView().closeAllEditors();
+	await prepareEmptyTestFolder(workspaceFolder);
+	await VSBrowser.instance.openResources(workspaceFolder);
+}
