@@ -84,9 +84,8 @@ describe.only('Tooling for Apache Camel K extension', function () {
 		});
 
 		it('Test Java Debugger Not Available On Invalid File', async function() {
-			this.timeout(20000);
-			const section = await getIntegrationSectionFromSideView(INTEGRATION_LABEL);
-			const item = await section.findItem(INTEGRATION_LABEL) as ViewItem;
+			this.timeout(20000)
+			const item = await findIntegrationOnSideBar(INTEGRATION_LABEL);
 			const menu = await item.openContextMenu();
 
 			assert.isFalse(await menu.hasItem(START_DEBUG_LABEL));
