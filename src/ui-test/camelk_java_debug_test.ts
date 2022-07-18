@@ -1,6 +1,7 @@
 import { assert } from 'chai';
 import path = require('path');
 import {
+	ActivityBar,
 	CustomTreeSection,
 	EditorView,
 	InputBox,
@@ -81,7 +82,7 @@ describe.only('Tooling for Apache Camel K extension', function () {
 
 		it('Test Java Debugger Not Available On Invalid File', async function() {
 			this.timeout(20000);
-			const section = await getIntegrationFromSideView(INTEGRATION_LABEL);
+			const section = await getIntegrationSectionFromSideView(INTEGRATION_LABEL);
 			const item = await section.findItem(INTEGRATION_LABEL) as ViewItem;
 			const menu = await item.openContextMenu();
 
@@ -104,25 +105,6 @@ async function startIntegrationOnCurrentFile() {
 	await startMode.selectQuickPick('Basic');
 
 	await VSBrowser.instance.driver.sleep(1000);
-}
-
-async function getIntegrationFromSideView(integrationLabel: string) {
-	// verify that started integration is properly running and visible inside Camel K integrations view
-	const section = await new SideBarView().getContent().getSection('Apache Camel K Integrations') as CustomTreeSection;
-	await section.expand();
-	
-	await VSBrowser.instance.driver.sleep(1000);
-
-	const visibleItems = await section.getVisibleItems();
-	let found = false;
-	for (const visibleItem of visibleItems) {
-		if (integrationLabel === await visibleItem.getText()) {
-			found = true;
-		}
-	}
-	assert.isTrue(found, `The integration with label ${integrationLabel} has not been found in visible items.`);
-	console.log('integration started');
-	return section;
 }
 
 async function createIntegration(fileName: string) {
@@ -155,7 +137,7 @@ async function modifyCurrentFileToBeInvalid() {
 }
 
 async function removeIntegration(integrationLabel: string) {
-	const section = await getIntegrationFromSideView(integrationLabel);
+	const section = await getIntegrationSectionFromSideView(integrationLabel);
 	const item = await section.findItem(integrationLabel) as ViewItem;
 	const menu = await item.openContextMenu();
 	const removeItem = await menu.getItem(REMOVE_INTEGRATION_LABEL);
@@ -169,6 +151,19 @@ async function prepareTempWorkspaceForTests(workspaceFolder: string) {
 }
 
 async function findIntegrationOnSideBar(integrationLabel: string) {
-	const section = await getIntegrationFromSideView(integrationLabel);
+	const section = await getIntegrationSectionFromSideView(integrationLabel);
 	return await section.findItem(integrationLabel) as ViewItem;
+}
+
+async function getIntegrationSectionFromSideView(integrationLabel: string) {
+	await getIntoExplorerView();
+	const section = await new SideBarView().getContent().getSection('Apache Camel K Integrations') as CustomTreeSection;
+	await section.expand();
+	await VSBrowser.instance.driver.sleep(5000);
+	return section;
+}
+
+async function getIntoExplorerView() {
+	const control = await new ActivityBar().getViewControl('Explorer');
+	await control?.openView();
 }
