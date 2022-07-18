@@ -33,18 +33,19 @@ describe.only('Tooling for Apache Camel K extension', function () {
 	
 	describe('Java Debug', function () {
 		
-		const integrationLabel = 'java-debug-test';
+		const INTEGRATION_LABEL = 'java-debug-test';
+		const INTEGRATION_FILE = 'JavaDebugTest';
 
 		before(async function (){
 			this.timeout(200000);
-			await createIntegration('JavaDebugTest');
+			await createIntegration(INTEGRATION_FILE);
 			await startIntegrationOnCurrentFile();
 			await VSBrowser.instance.driver.sleep(5000);
 		})
 
 		it('Check Java Debug available', async function () {
-			const section = await getIntegrationFromSideView(integrationLabel);
-			const item = await section.findItem(integrationLabel) as ViewItem;
+			const section = await getIntegrationFromSideView(INTEGRATION_LABEL);
+			const item = await section.findItem(INTEGRATION_LABEL) as ViewItem;
 			const menu = await item.openContextMenu();
 
 			assert.isTrue(await menu.hasItem(START_DEBUG_LABEL));
@@ -59,7 +60,7 @@ describe.only('Tooling for Apache Camel K extension', function () {
 		})
 
 		after(async function() {
-			await removeIntegration(integrationLabel);
+			await removeIntegration(INTEGRATION_LABEL);
 			await prepareEmptyTestFolder(WORKSPACE_FOLDER);
 		});
 
@@ -67,26 +68,27 @@ describe.only('Tooling for Apache Camel K extension', function () {
 
 	describe('No Java Debug on Invalid Files', function() {
 
-		const integrationLabel = 'java-debug-test-invalid';
+		const INTEGRATION_LABEL = 'java-debug-test-invalid';
+		const INTEGRATION_FILE = 'JavaDebugTestInvalid';
 
 		before(async function (){
 			this.timeout(200000);
-			await createIntegration('JavaDebugTestInvalid');
+			await createIntegration(INTEGRATION_FILE);
 			await modifyCurrentFileToBeInvalid();
 			await startIntegrationOnCurrentFile();
 			await VSBrowser.instance.driver.sleep(3000);
 		});
 
 		it('Test Java Debugger Not Available On Invalid File', async function() {
-			const section = await getIntegrationFromSideView(integrationLabel);
-			const item = await section.findItem(integrationLabel) as ViewItem;
+			const section = await getIntegrationFromSideView(INTEGRATION_LABEL);
+			const item = await section.findItem(INTEGRATION_LABEL) as ViewItem;
 			const menu = await item.openContextMenu();
 
 			assert.isFalse(await menu.hasItem(START_DEBUG_LABEL));
 		});
 
 		after(async function() {
-			await removeIntegration(integrationLabel);
+			await removeIntegration(INTEGRATION_LABEL);
 			await prepareEmptyTestFolder(WORKSPACE_FOLDER);
 		});
 	})
