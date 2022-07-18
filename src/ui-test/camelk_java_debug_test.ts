@@ -3,6 +3,7 @@ import path = require('path');
 import {
 	ActivityBar,
 	CustomTreeSection,
+	DebugToolbar,
 	EditorView,
 	InputBox,
 	SideBarView,
@@ -23,11 +24,10 @@ const REMOVE_INTEGRATION_LABEL = 'Remove Apache Camel K Integration';
 describe.only('Tooling for Apache Camel K extension', function () {
 
 	before(async function () {
-		this.timeout(20000);
+		this.timeout(200000);
 		await prepareTempWorkspaceForTests(WORKSPACE_FOLDER);
 		await VSBrowser.instance.driver.sleep(3000);
 	});
-	
 	
 	describe('Java Debug', function () {
 		
@@ -50,13 +50,16 @@ describe.only('Tooling for Apache Camel K extension', function () {
 			assert.isTrue(await menu.hasItem(START_DEBUG_LABEL));
 		});
 
-		it('Check Java Debug stops at breakpoint', async function() {
-			this.timeout(20000);
-			//open file
-			//set breakpoint (how?)
-			//Start debugger
-			//Check it stops at line
-			//?
+		it.skip('Check Java Debug stops at breakpoint', async function() {
+			//Currently failing because "No Java Debugger configured" error window
+			//It won't work even if I install the extension using ExTester or manually on the VSCode Instance
+			this.timeout(30000);
+			await addBreakpointToFile();
+			await startDebuggerOn(INTEGRATION_LABEL);
+			await VSBrowser.instance.driver.sleep(3000);
+			assert.isTrue(isThereSomethingInVariablesInDebugger());
+
+			await stopAndExitDebug();
 		})
 
 		after(async function() {
@@ -136,6 +139,12 @@ async function modifyCurrentFileToBeInvalid() {
 	await textEditor.save()
 }
 
+async function addBreakpointToFile() {
+	const textEditor : TextEditor = new TextEditor();
+	await textEditor.toggleBreakpoint(13);
+	await textEditor.save();
+}
+
 async function removeIntegration(integrationLabel: string) {
 	const section = await getIntegrationSectionFromSideView(integrationLabel);
 	const item = await section.findItem(integrationLabel) as ViewItem;
@@ -156,14 +165,38 @@ async function findIntegrationOnSideBar(integrationLabel: string) {
 }
 
 async function getIntegrationSectionFromSideView(integrationLabel: string) {
-	await getIntoExplorerView();
 	const section = await new SideBarView().getContent().getSection('Apache Camel K Integrations') as CustomTreeSection;
 	await section.expand();
 	await VSBrowser.instance.driver.sleep(5000);
 	return section;
 }
 
+async function stopAndExitDebug() {
+	await stopDebugging();
+	await getIntoExplorerView();
+}
+
+async function stopDebugging() {
+	await (await DebugToolbar.create()).stop();
+}
+
 async function getIntoExplorerView() {
 	const control = await new ActivityBar().getViewControl('Explorer');
 	await control?.openView();
+}
+
+async function getContextMenuOf(integrationLabel: string) {
+	const item = await findIntegrationOnSideBar(integrationLabel);
+	return await item.openContextMenu()
+}
+
+async function startDebuggerOn(integrationLabel: string) {
+	const menu = await getContextMenuOf(integrationLabel);
+
+	await menu.getItem(START_DEBUG_LABEL).then(item => item?.click());
+}
+
+async function isThereSomethingInVariablesInDebugger() {
+	const section = await new SideBarView().getContent().getSection('Variables') as CustomTreeSection;
+	return await (await section.getVisibleItems()).length > 0;
 }
