@@ -22,7 +22,7 @@ const REMOVE_INTEGRATION_LABEL = 'Remove Apache Camel K Integration';
 describe.only('Tooling for Apache Camel K extension', function () {
 
 	before(async function () {
-		this.timeout(90000);
+		this.timeout(20000);
 		await prepareTempWorkspaceForTests(WORKSPACE_FOLDER);
 		await VSBrowser.instance.driver.sleep(3000);
 	});
@@ -34,21 +34,23 @@ describe.only('Tooling for Apache Camel K extension', function () {
 		const INTEGRATION_FILE = 'JavaDebugTest';
 
 		before(async function (){
-			this.timeout(200000);
+			this.timeout(20000);
 			await createIntegration(INTEGRATION_FILE);
 			await startIntegrationOnCurrentFile();
 			await VSBrowser.instance.driver.sleep(5000);
 		})
 
 		it('Check Java Debug available', async function () {
-			const section = await getIntegrationFromSideView(INTEGRATION_LABEL);
-			const item = await section.findItem(INTEGRATION_LABEL) as ViewItem;
+			this.timeout(20000);
+
+			const item = await findIntegrationOnSideBar(INTEGRATION_LABEL);
 			const menu = await item.openContextMenu();
 
 			assert.isTrue(await menu.hasItem(START_DEBUG_LABEL));
 		});
 
 		it('Check Java Debug stops at breakpoint', async function() {
+			this.timeout(20000);
 			//open file
 			//set breakpoint (how?)
 			//Start debugger
@@ -57,6 +59,7 @@ describe.only('Tooling for Apache Camel K extension', function () {
 		})
 
 		after(async function() {
+			this.timeout(20000);
 			await removeIntegration(INTEGRATION_LABEL);
 			await prepareEmptyTestFolder(WORKSPACE_FOLDER);
 		});
@@ -69,7 +72,7 @@ describe.only('Tooling for Apache Camel K extension', function () {
 		const INTEGRATION_FILE = 'JavaDebugTestInvalid';
 
 		before(async function (){
-			this.timeout(200000);
+			this.timeout(20000);
 			await createIntegration(INTEGRATION_FILE);
 			await modifyCurrentFileToBeInvalid();
 			await startIntegrationOnCurrentFile();
@@ -77,6 +80,7 @@ describe.only('Tooling for Apache Camel K extension', function () {
 		});
 
 		it('Test Java Debugger Not Available On Invalid File', async function() {
+			this.timeout(20000);
 			const section = await getIntegrationFromSideView(INTEGRATION_LABEL);
 			const item = await section.findItem(INTEGRATION_LABEL) as ViewItem;
 			const menu = await item.openContextMenu();
@@ -85,6 +89,7 @@ describe.only('Tooling for Apache Camel K extension', function () {
 		});
 
 		after(async function() {
+			this.timeout(20000);
 			await removeIntegration(INTEGRATION_LABEL);
 			await prepareEmptyTestFolder(WORKSPACE_FOLDER);
 		});
@@ -161,4 +166,9 @@ async function prepareTempWorkspaceForTests(workspaceFolder: string) {
 	await new EditorView().closeAllEditors();
 	await prepareEmptyTestFolder(workspaceFolder);
 	await VSBrowser.instance.openResources(workspaceFolder);
+}
+
+async function findIntegrationOnSideBar(integrationLabel: string) {
+	const section = await getIntegrationFromSideView(integrationLabel);
+	return await section.findItem(integrationLabel) as ViewItem;
 }
