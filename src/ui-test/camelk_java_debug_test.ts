@@ -12,17 +12,20 @@ import {
 } from 'vscode-extension-tester';
 import { prepareEmptyTestFolder } from './utils/resourcesUtils';
 
+const TEST_FOLDER = '../../../testFolder';
+const WORKSPACE_FOLDER = path.join(__dirname, TEST_FOLDER);
+
+const START_DEBUG_LABEL = 'Start Java debugger on Camel K integration';
+const REMOVE_INTEGRATION_LABEL = 'Remove Apache Camel K Integration';
+
+
 describe.only('Tooling for Apache Camel K extension', function () {
-
-	const testFolder = '../../../testFolder';
-	const workspaceFolder = path.join(__dirname, testFolder);
-
 
 	before(async function () {
 		this.timeout(90000);
 		await new EditorView().closeAllEditors();
-		await prepareEmptyTestFolder(workspaceFolder);
-		await VSBrowser.instance.openResources(workspaceFolder);
+		await prepareEmptyTestFolder(WORKSPACE_FOLDER);
+		await VSBrowser.instance.openResources(WORKSPACE_FOLDER);
 		// have a conditional wait for the extension to be activated
 		await VSBrowser.instance.driver.sleep(3000);
 	});
@@ -44,7 +47,7 @@ describe.only('Tooling for Apache Camel K extension', function () {
 			const item = await section.findItem(integrationLabel) as ViewItem;
 			const menu = await item.openContextMenu();
 
-			assert.isTrue(await menu.hasItem('Start Java debugger on Camel K integration'));
+			assert.isTrue(await menu.hasItem(START_DEBUG_LABEL));
 		});
 
 		it('Check Java Debug stops at breakpoint', async function() {
@@ -57,7 +60,7 @@ describe.only('Tooling for Apache Camel K extension', function () {
 
 		after(async function() {
 			await removeIntegration(integrationLabel);
-			await prepareEmptyTestFolder(workspaceFolder);
+			await prepareEmptyTestFolder(WORKSPACE_FOLDER);
 		});
 
 	});
@@ -79,12 +82,12 @@ describe.only('Tooling for Apache Camel K extension', function () {
 			const item = await section.findItem(integrationLabel) as ViewItem;
 			const menu = await item.openContextMenu();
 
-			assert.isFalse(await menu.hasItem('Start Java debugger on Camel K integration'));
+			assert.isFalse(await menu.hasItem(START_DEBUG_LABEL));
 		});
 
 		after(async function() {
 			await removeIntegration(integrationLabel);
-			await prepareEmptyTestFolder(workspaceFolder);
+			await prepareEmptyTestFolder(WORKSPACE_FOLDER);
 		});
 	})
 
@@ -123,8 +126,8 @@ async function createIntegration(fileName: string) {
 	await workbench.executeCommand('Create a new Apache Camel K Integration file');
 	const languageInput = await InputBox.create();
 	await languageInput.selectQuickPick('Java');
-	const workspaceFolderInput = await InputBox.create();
-	await workspaceFolderInput.selectQuickPick(0);
+	const WORKSPACE_FOLDERInput = await InputBox.create();
+	await WORKSPACE_FOLDERInput.selectQuickPick(0);
 	const nameInput = await InputBox.create();
 	await nameInput.setText(fileName);
 	await nameInput.confirm();
@@ -151,7 +154,7 @@ async function removeIntegration(integrationLabel: string) {
 	const section = await getIntegrationFromSideView(integrationLabel);
 	const item = await section.findItem(integrationLabel) as ViewItem;
 	const menu = await item.openContextMenu();
-	const removeItem = await menu.getItem('Remove Apache Camel K Integration');
+	const removeItem = await menu.getItem(REMOVE_INTEGRATION_LABEL);
 	await removeItem?.click();
 }
 
