@@ -5,76 +5,107 @@ import {
 	EditorView,
 	InputBox,
 	SideBarView,
+	TextEditor,
 	ViewItem,
 	VSBrowser,
 	Workbench
 } from 'vscode-extension-tester';
-import { DefaultWait } from 'vscode-uitests-tooling';
+import { prepareEmptyTestFolder } from './utils/resourcesUtils';
 
-describe('Tooling for Apache Camel K extension', function () {
+describe.only('Tooling for Apache Camel K extension', function () {
+
+	const testFolder = '../../../testFolder';
+	const workspaceFolder = path.join(__dirname, testFolder);
+
 
 	before(async function () {
 		this.timeout(90000);
 		await new EditorView().closeAllEditors();
-		const workspaceFolder = path.join(__dirname, '../../../test Fixture with speci@l chars');
+		await prepareEmptyTestFolder(workspaceFolder);
 		await VSBrowser.instance.openResources(workspaceFolder);
 		// have a conditional wait for the extension to be activated
-		await VSBrowser.instance.driver.sleep(30000);
+		await VSBrowser.instance.driver.sleep(3000);
 	});
 	
-	after(async function () {
-		await new EditorView().closeAllEditors();
-	});
 	
 	describe('Java Debug', function () {
 		
-		it('Create File Deploy it and Check Java Debug available', async function () {
-			this.timeout(20000);
-			await createIntegration('JavaDebugTest');
-			
-			const integrationLabel = 'java-debug-test';
-			const section = await startIntegration(integrationLabel);
+		const integrationLabel = 'java-debug-test';
 
+		before(async function (){
+			this.timeout(200000);
+			await createIntegration('JavaDebugTest');
+			await startIntegrationOnCurrentFile();
+			await VSBrowser.instance.driver.sleep(5000);
+		})
+
+		it('Check Java Debug available', async function () {
+			const section = await getIntegrationFromSideView(integrationLabel);
 			const item = await section.findItem(integrationLabel) as ViewItem;
 			const menu = await item.openContextMenu();
+
 			assert.isTrue(await menu.hasItem('Start Java debugger on Camel K integration'));
-			
-			//TODO: in another iteration, actually click on the java debug contextual menu, but need to modify the code before and provide a breakpoint
 		});
 
-		it('Create invalid File, Deploy it and Check Java Debug is not available', async function () {
-			this.timeout(20000);
-			await createIntegration('JavaInvalidDebugTest');
-			
-			// TODO: modify file to be invalid but still appear in deployment
-			
-			const integrationLabel = 'java-invalid-debug-test';
-			const section = await startIntegration(integrationLabel);
+		it('Check Java Debug stops at breakpoint', async function() {
+			//open file
+			//set breakpoint (how?)
+			//Start debugger
+			//Check it stops at line
+			//?
+		})
 
-			// TODO: check Java debug is available on right-click
-			const item = await section.findItem(integrationLabel) as ViewItem;
-			const menu = await item.openContextMenu();
-			assert.isFalse(await menu.hasItem('Start Java debugger on Camel K integration'));
-			
+		after(async function() {
+			await removeIntegration(integrationLabel);
+			await prepareEmptyTestFolder(workspaceFolder);
 		});
 
 	});
 
+	describe('No Java Debug on Invalid Files', function() {
+
+		const integrationLabel = 'java-debug-test-invalid';
+
+		before(async function (){
+			this.timeout(200000);
+			await createIntegration('JavaDebugTestInvalid');
+			await modifyCurrentFileToBeInvalid();
+			await startIntegrationOnCurrentFile();
+			await VSBrowser.instance.driver.sleep(3000);
+		});
+
+		it('Test Java Debugger Not Available On Invalid File', async function() {
+			const section = await getIntegrationFromSideView(integrationLabel);
+			const item = await section.findItem(integrationLabel) as ViewItem;
+			const menu = await item.openContextMenu();
+
+			assert.isFalse(await menu.hasItem('Start Java debugger on Camel K integration'));
+		});
+
+		after(async function() {
+			await removeIntegration(integrationLabel);
+			await prepareEmptyTestFolder(workspaceFolder);
+		});
+	})
+
 });
-async function startIntegration(integrationLabel: string) {
+async function startIntegrationOnCurrentFile() {
 	const workbench = new Workbench();
 	await workbench.executeCommand('Start Apache Camel K Integration');
 	console.log('Start command');
 	const startMode = await InputBox.create();
 	await startMode.selectQuickPick('Basic');
 
+	await VSBrowser.instance.driver.sleep(1000);
+}
+
+async function getIntegrationFromSideView(integrationLabel: string) {
+	// verify that started integration is properly running and visible inside Camel K integrations view
 	const section = await new SideBarView().getContent().getSection('Apache Camel K Integrations') as CustomTreeSection;
 	await section.expand();
+	
+	await VSBrowser.instance.driver.sleep(1000);
 
-	await DefaultWait.sleep(2000); // TODO: not nice, need to remove or replace with dynamic wait
-
-
-	// verify that started integration is properly running and visible inside Camel K integrations view
 	const visibleItems = await section.getVisibleItems();
 	let found = false;
 	for (const visibleItem of visibleItems) {
@@ -110,3 +141,25 @@ async function createIntegration(fileName: string) {
 	return workbench;
 }
 
+async function modifyCurrentFileToBeInvalid() {
+	const textEditor : TextEditor = new TextEditor();
+	await textEditor.setTextAtLine(14, ";");
+	await textEditor.save()
+}
+
+async function removeIntegration(integrationLabel: string) {
+	const section = await getIntegrationFromSideView(integrationLabel);
+	const item = await section.findItem(integrationLabel) as ViewItem;
+	const menu = await item.openContextMenu();
+	const removeItem = await menu.getItem('Remove Apache Camel K Integration');
+	await removeItem?.click();
+}
+
+// async function removeFile(fileName: string) {
+// 	const section = await new SideBarView().getContent().getSection('Explorer') as CustomTreeSection;
+// 	const item = await section.findItem(fileName + ".java") as ViewItem;
+// 	const menu = await item.openContextMenu();
+// 	const removeItem = await menu.getItem('Delete');
+// 	await removeItem?.click();
+// 	await new ModalDialog().pushButton('Move to Trash');
+// }

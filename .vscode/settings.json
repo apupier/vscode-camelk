@@ -5,5 +5,10 @@
     },
     "search.exclude": {
         "out": true // set this to false to include "out" folder in search results
-    }
+    },
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "/home/joshiraez/.config/Code/User/globalStorage/redhat.vscode-camelk/java-dependencies-3.16.0/dependencies/*.jar",
+        "/home/joshiraez/.config/Code/User/globalStorage/redhat.vscode-camelk/java-dependencies-3.14.1/dependencies/*.jar"
+    ]
 }
